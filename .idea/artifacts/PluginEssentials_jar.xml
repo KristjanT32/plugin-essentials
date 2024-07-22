@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="PluginEssentials:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/PluginEssentials_jar</output-path>
+    <root id="archive" name="PluginEssentials.jar">
+      <element id="module-output" name="PluginEssentials" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/commons-io/commons-io/2.16.1/commons-io-2.16.1.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

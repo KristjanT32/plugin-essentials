@@ -1,22 +1,31 @@
-package krisapps.PluginEssentials.utils;
+package org.krisapps.PluginEssentials;
 
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.hover.content.Content;
 import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class MessageUtility {
 
-    public MessageUtility() {
+    private JavaPlugin plugin;
 
+    public MessageUtility(JavaPlugin plugin) {
+        this.plugin = plugin;
     }
 
 
@@ -31,6 +40,60 @@ public class MessageUtility {
      */
     public void sendMessage(CommandSender target, String message) {
         target.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+    }
+
+
+    /**
+     * Send a message (with color codes) to a player using BaseComponents
+     *
+     * @param target  the player who receives the message
+     * @param messageComponents the message components to send
+     * @
+     */
+
+    // TODO: make it work, currently does not
+    public void sendComplexMessage(CommandSender target, BaseComponent... messageComponents) {
+        List<BaseComponent> out = new ArrayList<>();
+
+        for (BaseComponent com: messageComponents) {
+            if (com instanceof TextComponent) {
+                TextComponent finalComponent = new TextComponent();
+
+                String text = ChatColor.translateAlternateColorCodes('&', ((TextComponent) com).getText());
+                for (BaseComponent c: TextComponent.fromLegacyText(text)) {
+                    finalComponent.addExtra(c);
+                }
+
+                if (com.getHoverEvent() != null) {
+                    // Copy all contents (but now colorized) to the new content list.
+                    List<Content> colorizedHoverEventContents = new ArrayList<>();
+                    for (Content content : com.getHoverEvent().getContents()) {
+                        if (content instanceof Text) {
+                            Object textContent = ((Text) content).getValue();
+                            if (textContent instanceof TextComponent) {
+                                colorizedHoverEventContents.add(new Text(ChatColor.translateAlternateColorCodes('&',
+                                        ((TextComponent) textContent).getText()
+                                )));
+                            } else if (textContent instanceof String) {
+                                colorizedHoverEventContents.add(new Text(ChatColor.translateAlternateColorCodes('&',
+                                        textContent.toString()
+                                )));
+                            }
+                        }
+                    }
+                    finalComponent.setHoverEvent(new HoverEvent(com.getHoverEvent().getAction(), colorizedHoverEventContents));
+                }
+
+                if (com.getClickEvent() != null) {
+                    finalComponent.setClickEvent(com.getClickEvent());
+                }
+                out.add(finalComponent);
+            }
+        }
+
+
+
+        target.spigot().sendMessage(out.toArray(new BaseComponent[0]));
     }
 
     /**

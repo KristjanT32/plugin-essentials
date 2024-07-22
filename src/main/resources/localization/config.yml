@@ -1,0 +1,8 @@
+# Language configuration file
+
+# The currently used language
+currentLanguage: ""
+
+# All available languages (auto-populated)
+languages: [
+]
